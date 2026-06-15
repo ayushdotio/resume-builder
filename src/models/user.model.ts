@@ -1,4 +1,4 @@
-import { Document, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import { IUser } from "@/types/user.types";
 
@@ -39,13 +39,16 @@ const userSchema = new Schema<IUserModel>({
 userSchema.methods.comparePassword = async function (
   password: string,
 ): Promise<boolean> {
-  return bcrypt.compare(password, this.password);
+  if (!this.password) return false;
+  return await bcrypt.compare(password, this.password);
 };
 
-userSchema.pre("save", async function (): Promise<void> {
+userSchema.pre("save", function (): void {
   if (!this.isModified("password")) return;
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  const salt = bcrypt.genSaltSync(10);
+  this.password = bcrypt.hashSync(this.password, salt);
 });
 
-export const User = model("User", userSchema);
+const UserModel =
+  mongoose.models.UserModel || model<IUserModel>("User", userSchema);
+export default UserModel;
