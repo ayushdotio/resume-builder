@@ -24,3 +24,11 @@ export interface generateExperienceDescription {
   techStack: string[];
   experienceLevel: string;
 }
+
+export interface ImproveContentBody {
+  content: string;
+}
+
+export interface GenerateATS {
+  resumeText: string;
+}
